@@ -96,14 +96,9 @@ const gameField = (function() {
 })();
 
 function playerFactory(name, mark) {
-    function makeTurn(x, y) {
-        console.log(`Player "${name}" goes [${x}, ${y}] with mark: ${mark}`);
-    }
-
     return {
         name,
-        mark,
-        makeTurn
+        mark
     };
 }
 
@@ -120,17 +115,22 @@ const gameManager = (function () {
         uiController.initEvents();
     }
 
+    function currentPlayer() {
+        return currentTurn === 0 ? player1.name : player2.name;
+    }
+
     function initPlayers(p1, p2) {
         player1 = p1;
         player2 = p2;
     }
 
     function makeTurn(x, y) {
-        const currentPlayer = currentTurn === 0 ? player1 : player2;
-        currentPlayer.makeTurn(x, y);
+        const player = currentTurn === 0 ? player1 : player2;
         currentTurn = currentTurn === 0 ? 1 : 0;
+        const nextPlayerName = currentPlayer();
+        uiController.setLoggerText(`${nextPlayerName}, now it's your turn!`);
         
-        gameField.mark(x, y, currentPlayer.mark);
+        gameField.mark(x, y, player.mark);
         const gameCondition = gameField.getCondition();
 
         // Add logic for screen
@@ -149,6 +149,7 @@ const gameManager = (function () {
         switch (gameState.result) {
             case "draw": {
                 isGameStopped = true;
+                uiController.setLoggerText("It's a draw. Good fight though!");
                 uiController.renderDrawResult();
                 uiController.removeEvents();
                 break;
@@ -156,6 +157,7 @@ const gameManager = (function () {
             case "winner": {
                 isGameStopped = true;
                 const winner = player1.mark === gameState.line[0].marker ? player1 : player2;
+                uiController.setLoggerText(`Good job, ${winner.name}! You're champion for this round!`);
                 uiController.renderWinResult(gameState.line);
                 uiController.removeEvents();
                 break;
@@ -176,6 +178,7 @@ const gameManager = (function () {
         restartGame,
         initPlayers,
         makeTurn,
+        currentPlayer,
         gameStopped
     };
 })();
@@ -194,6 +197,11 @@ const uiController = (function() {
         greetingPanel.remove();
 
         renderBoard();
+    }
+
+    function setLoggerText(text) {
+        const logger = document.querySelector(".logInfo");
+        logger.textContent = text;
     }
 
     function renderDrawResult() {
@@ -252,7 +260,7 @@ const uiController = (function() {
         const logContainer = document.createElement("div");
         logContainer.classList.add("logContainer");
         const logInfo = document.createElement("h1"); 
-        logInfo.textContent = "Game started";
+        logInfo.textContent = gameManager.currentPlayer() + ", now is your turn!";
         logInfo.classList.add("logInfo");
         const restartButton = document.createElement("button");
         restartButton.classList.add("starter");
@@ -279,6 +287,7 @@ const uiController = (function() {
         renderBoard,
         renderDrawResult,
         renderWinResult,
+        setLoggerText,
         removeEvents
     };
 })();

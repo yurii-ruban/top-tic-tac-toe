@@ -87,6 +87,7 @@ body {
         color: rgb(60, 56, 56);
         flex: 2 1 auto;
         cursor: default;
+        text-align: center;
     }
 }
 
