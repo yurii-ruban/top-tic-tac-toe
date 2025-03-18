@@ -22,7 +22,24 @@ const gameField = (function() {
             return;
         }
 
+        if (field[x][y].elem) {
+            field[x][y].elem.style.backgroundImage = marker === xMark ? "url(./img/cross.svg)" : "url(./img/round.svg)";
+        }
+
         field[x][y].marker = marker;
+    }
+
+    function setElement (x, y, elem) {
+        if (x >= fieldSize || x < 0 || y >= fieldSize || y < 0) return;
+        if (field[x][y].elem) {
+            return;
+        }
+
+        field[x][y].elem = elem;
+    }
+
+    function getFieldSize() {
+        return fieldSize;
     }
 
     function getCondition() {
@@ -72,6 +89,8 @@ const gameField = (function() {
     return {
         resetField,
         mark,
+        setElement,
+        getFieldSize,
         getCondition
     };
 })();
@@ -95,9 +114,9 @@ const gameManager = (function () {
     let player2;
 
     function startGame() {
+        isGameStopped = false;
         gameField.resetField();
         currentTurn = getPriority();
-
         uiController.initEvents();
     }
 
@@ -123,23 +142,22 @@ const gameManager = (function () {
     }
 
     function restartGame() {
-        gameField.resetField();
+        startGame();
     }
 
     function endGame(gameState) {
         switch (gameState.result) {
             case "draw": {
                 isGameStopped = true;
-                // Add logic to disable next moves
-                console.log(`It's a draw. gameState: ${gameState.result}. Try again!`);
-                console.table(gameState.line);
+                uiController.renderDrawResult();
+                uiController.removeEvents();
                 break;
             }
             case "winner": {
                 isGameStopped = true;
                 const winner = player1.mark === gameState.line[0].marker ? player1 : player2;
-                console.log(`Now we have a winner! Winner is ${winner.name}`);
-                console.dir(gameState.line);
+                uiController.renderWinResult(gameState.line);
+                uiController.removeEvents();
                 break;
             }
         }
@@ -178,13 +196,29 @@ const uiController = (function() {
         renderBoard();
     }
 
+    function renderDrawResult() {
+        const boardContainer = document.querySelector(".boardContainer");
+        const tiles = Array.from(boardContainer.children);
+        tiles.forEach((item) => {
+            item.classList.toggle("draw");
+        });
+    };
+
+    function renderWinResult(winLane) {
+        winLane.forEach((arrObject) => {
+            const item = arrObject.elem;
+            item.classList.toggle("win");
+        });
+    }
+
     function resetGameEvent(clickEv) {
-        const bodyChilds = Array.from(body.childNodes);
+        const bodyChilds = Array.from(body.children);
         bodyChilds.forEach((item) => {
             item.remove();
         });
         
         body.appendChild(greetingPanel);
+        gameManager.restartGame();
     }
 
     function initEvents () {
@@ -192,9 +226,27 @@ const uiController = (function() {
         startBtn.addEventListener("click", startGameEvent);
     }
 
+    function processTurn(clickEv) {
+        const tile = clickEv.target;
+        if (Array.from(tile.classList).includes("boardElement")) {
+            gameManager.makeTurn(tile.dataset.i, tile.dataset.j);
+        }
+    }
+
     function renderBoard() {
         const boardContainer = document.createElement("div");
         boardContainer.classList.add("boardContainer");
+        for (let i = 0; i < gameField.getFieldSize(); ++i) {
+            for (let j = 0; j < gameField.getFieldSize(); ++j) {
+                const elem = document.createElement("div");
+                elem.classList.add("boardElement");
+                elem.dataset.i = i;
+                elem.dataset.j = j;
+                gameField.setElement(i, j, elem);
+                boardContainer.appendChild(elem);
+            }
+        }
+        boardContainer.addEventListener("click", processTurn);
         body.appendChild(boardContainer);
 
         const logContainer = document.createElement("div");
@@ -212,16 +264,23 @@ const uiController = (function() {
 
     }
 
+    function removeEvents() {
+        const boardContainer = document.querySelector(".boardContainer");
+        boardContainer.style.opacity = "0.5";
+        const children = Array.from(boardContainer.children);
+        children.forEach((child) => {
+            child.style.opacity = "0.7";
+        });
+        boardContainer.removeEventListener("click", processTurn);
+    }
+
     return {
         initEvents,
-        renderBoard
+        renderBoard,
+        renderDrawResult,
+        renderWinResult,
+        removeEvents
     };
 })();
 
-
 gameManager.startGame();
-// while (!gameManager.gameStopped()) {
-//     coordX = Math.floor(Math.random() * 3);
-//     coordY = Math.floor(Math.random() * 3);
-//     gameManager.makeTurn(coordX, coordY);
-// }
