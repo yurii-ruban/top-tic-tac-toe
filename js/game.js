@@ -91,12 +91,19 @@ function playerFactory(name, mark) {
 const gameManager = (function () {
     let isGameStopped = false;
     let currentTurn = 0;
-    const player1 = playerFactory('John', xMark);
-    const player2 = playerFactory('Anna', oMark);
+    let player1;
+    let player2;
 
     function startGame() {
         gameField.resetField();
         currentTurn = getPriority();
+
+        uiController.initEvents();
+    }
+
+    function initPlayers(p1, p2) {
+        player1 = p1;
+        player2 = p2;
     }
 
     function makeTurn(x, y) {
@@ -149,15 +156,72 @@ const gameManager = (function () {
     return {
         startGame,
         restartGame,
+        initPlayers,
         makeTurn,
         gameStopped
     };
 })();
 
+const uiController = (function() {
+    const body = document.querySelector("body");
+    let greetingPanel = document.querySelector(".greeting-panel");
+
+    function startGameEvent(clickEv) {
+        clickEv.preventDefault();
+        const p1Name = document.querySelector("#p1").value;
+        const p2Name = document.querySelector("#p2").value;
+        const player1 = playerFactory(p1Name, xMark);
+        const player2 = playerFactory(p2Name, oMark);
+        gameManager.initPlayers(player1, player2);
+        greetingPanel.remove();
+
+        renderBoard();
+    }
+
+    function resetGameEvent(clickEv) {
+        const bodyChilds = Array.from(body.childNodes);
+        bodyChilds.forEach((item) => {
+            item.remove();
+        });
+        
+        body.appendChild(greetingPanel);
+    }
+
+    function initEvents () {
+        const startBtn = document.querySelector(".starter");
+        startBtn.addEventListener("click", startGameEvent);
+    }
+
+    function renderBoard() {
+        const boardContainer = document.createElement("div");
+        boardContainer.classList.add("boardContainer");
+        body.appendChild(boardContainer);
+
+        const logContainer = document.createElement("div");
+        logContainer.classList.add("logContainer");
+        const logInfo = document.createElement("h1"); 
+        logInfo.textContent = "Game started";
+        logInfo.classList.add("logInfo");
+        const restartButton = document.createElement("button");
+        restartButton.classList.add("starter");
+        restartButton.textContent = "Restart";
+        restartButton.addEventListener("click", resetGameEvent);
+        logContainer.appendChild(logInfo);
+        logContainer.appendChild(restartButton);
+        body.appendChild(logContainer);
+
+    }
+
+    return {
+        initEvents,
+        renderBoard
+    };
+})();
+
 
 gameManager.startGame();
-while (!gameManager.gameStopped()) {
-    coordX = Math.floor(Math.random() * 3);
-    coordY = Math.floor(Math.random() * 3);
-    gameManager.makeTurn(coordX, coordY);
-}
+// while (!gameManager.gameStopped()) {
+//     coordX = Math.floor(Math.random() * 3);
+//     coordY = Math.floor(Math.random() * 3);
+//     gameManager.makeTurn(coordX, coordY);
+// }

@@ -2,9 +2,80 @@
     box-sizing: border-box;
 }
 
-body {
+:root {
+    --border-radius: 10px;
+}
 
+body {
     background: rgb(96,44,131);
     background: linear-gradient(90deg, rgba(96,44,131,0.9679331205138305) 7%, rgba(255,139,0,0.8558883025866597) 50%, rgba(118,8,8,0.869893904827556) 93%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
 
+.boardContainer {
+    min-width: 700px;
+    min-height: 700px;
+    background-color: rgba(50, 119, 198, 0.704);
+    border: 5px solid rgb(41, 14, 14);
+    border-radius: var(--border-radius);
+    padding: 20px 20px;
+}
+
+.greeting-panel {
+    background-color: rgba(51, 145, 51, 0.433);
+    border-radius: var(--border-radius);
+    padding: 2.5em 2em;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5em;
+
+    .inputs {
+        display: flex;
+        justify-content: space-between;
+        gap: 1.5em;
+        font-size: 28px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+        .input-container {
+            input {
+                padding: 0.3em 0.2em;
+                font-size: 18px;
+            }
+        }
+    }
+}
+
+.logContainer {
+    width: 700px;
+    margin-top: 1.2em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    .logInfo {
+        font-family: Ubuntu, sans-serif;
+        font-size: 36px;
+        color: rgb(60, 56, 56);
+        flex: 2 1 auto;
+    }
+}
+
+.starter {
+    font-family: Ubuntu, sans-serif;
+    font-size: 36px;
+    background-color: rgba(236, 219, 196, 0.388);
+    padding: 0.7em 1.5em;
+    border-radius: var(--border-radius);
+    border: none;
+
+    &:active{
+        background-color: black;
+        color: antiquewhite;
+    }
 }
