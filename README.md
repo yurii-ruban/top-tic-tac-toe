@@ -6,11 +6,15 @@ https://yurii-ruban.github.io/top-tic-tac-toe
 
 ## Skills
  - HTML
-    * 
+    * Default boilerplate
+    * Link external files
  - CSS
-    * 
+    * Flexbox layout
+    * Grid layout
  - JS
-    * 
+    * Factory functions
+    * Module pattern
+    * Classes
 
 ## Purpose
 The **Tic Tac Toe**'s project aim is to practice skills when working with JS `Factory functions`, `Module pattern a.k. Singletone`, `Objects`, etc.
