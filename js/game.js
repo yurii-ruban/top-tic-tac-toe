@@ -243,7 +243,7 @@ class UIController {
         startBtn.addEventListener("click", this.startGameEvent.bind(this));
     }
 
-    processTurn(clickEv) {
+    processTurn = (clickEv) => {
         const tile = clickEv.target;
         if (Array.from(tile.classList).includes("boardElement")) {
             gameManager.makeTurn(tile.dataset.i, tile.dataset.j);
@@ -265,7 +265,7 @@ class UIController {
             }
         }
         
-        this.boardContainer.addEventListener("click", this.processTurn.bind(this));
+        this.boardContainer.addEventListener("click", this.processTurn);
         this.body.appendChild(this.boardContainer);
 
         this.renderLogContainer();
@@ -295,7 +295,7 @@ class UIController {
         children.forEach((child) => {
             child.style.opacity = "0.7";
         });
-        this.boardContainer.removeEventListener("click", this.processTurn.bind(this));
+        this.boardContainer.removeEventListener("click", this.processTurn);
     }
 }
 
